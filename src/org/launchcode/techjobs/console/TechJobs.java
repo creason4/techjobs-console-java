@@ -1,8 +1,8 @@
 package org.launchcode.techjobs.console;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
+
+import static java.lang.System.*;
 
 /**
  * Created by LaunchCode
@@ -26,7 +26,7 @@ public class TechJobs {
         actionChoices.put("search", "Search");
         actionChoices.put("list", "List");
 
-        System.out.println("Welcome to LaunchCode's TechJobs App!");
+        out.println("Welcome to LaunchCode's TechJobs App!");
 
         // Allow the user to search until they manually quit
         while (true) {
@@ -57,11 +57,14 @@ public class TechJobs {
                 String searchField = getUserSelection("Search by:", columnChoices);
 
                 // What is their search term?
-                System.out.println("\nSearch term: ");
-                String searchTerm = in.nextLine();
+               System.out.println("\nSearch term: ");
+               String searchTerm = in.nextLine().toUpperCase();
+                //LEC searchTerm.toUpperCase(); // Setting all Search Strings to uppercase
 
                 if (searchField.equals("all")) {
                     System.out.println("Search all fields not yet implemented.");
+                    printJobs(findByValue(searchTerm));
+                    //LEC//
                 } else {
                     printJobs(JobData.findByColumnAndValue(searchField, searchTerm));
                 }
@@ -86,15 +89,25 @@ public class TechJobs {
 
         do {
 
-            System.out.println("\n" + menuHeader);
+            out.println("\n" + menuHeader);
 
             // Print available choices
             for (Integer j = 0; j < choiceKeys.length; j++) {
-                System.out.println("" + j + " - " + choices.get(choiceKeys[j]));
+                out.println("" + j + " - " + choices.get(choiceKeys[j]));
             }
 
             choiceIdx = in.nextInt();
             in.nextLine();
+
+            // LEC
+            choiceIdx = in.nextInt();
+            in.nextLine();
+            try {
+                choiceIdx = in.nextInt();
+                in.nextLine();
+            }catch (Exception e){
+            System.out.println("Sorry, I could not process that please type 0 or 1");
+            }
 
             // Validate user's input
             if (choiceIdx < 0 || choiceIdx >= choiceKeys.length) {
@@ -110,7 +123,37 @@ public class TechJobs {
 
     // Print a list of jobs
     private static void printJobs(ArrayList<HashMap<String, String>> someJobs) {
+        if (someJobs.size() > 0 ) {
+            for (HashMap<String, String> field : someJobs) {
 
-        System.out.println("printJobs is not implemented yet");
+                for(Map.Entry<String, String> data: field.entrySet()) {
+                   System.out.println(data.getKey() + ": "+data.getValue() );
+
+                }
+                System.out.println("**************************");
+            }
+
+        } else System.out.println("Sorry there is nothing that matches your search");
+    }
+    public static ArrayList<HashMap<String, String>> findByValue(String searchTerm) {
+    ArrayList<HashMap<String, String>> allJobs = JobData.findAll();
+    ArrayList<HashMap<String, String>> matchingItems = new ArrayList<>();
+
+    for (HashMap<String, String> row: allJobs){
+
+        for(Map.Entry<String, String> column: row.entrySet()){
+            if (column.getValue().toUpperCase().contains(searchTerm)) {
+                if (Arrays.asList(matchingItems).contains(row)){
+                    continue;
+            }
+                matchingItems.add(row);
+            }
+        }
+
+
+    }
+
+    return matchingItems;
+
     }
 }
